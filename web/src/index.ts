@@ -1,9 +1,20 @@
-import { User } from "./models/User";
+import { UserList } from "./views/UserList";
+import { Collection } from "./models/Collection";
+import { User, UserProps } from "./models/User";
 
-const user = new User({ id: 1, name: "newer name", age: 0 });
+const users = new Collection(
+  "http://localhost:3000/users",
+  (json: UserProps) => {
+    return User.buildUser(json);
+  }
+);
 
-user.on("save", () => {
-  console.log(user);
+users.on("change", () => {
+  const root = document.getElementById("root");
+  if (root) {
+    new UserList(root, users).render();
+  }
 });
 
-user.save();
+console.log(users); //TODO troubleshoot why user collection is not rendered in DOM
+users.fetch();
